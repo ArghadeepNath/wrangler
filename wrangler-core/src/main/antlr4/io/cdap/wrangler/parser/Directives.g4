@@ -257,6 +257,22 @@ Number
  : Int ('.' Digit*)?
  ;
 
+ByteSize
+ : Int ('.' Digit+)? ByteUnit
+ ;
+
+TimeDuration
+ : Int ('.' Digit+)? TimeUnit
+ ;
+
+fragment ByteUnit
+ : [kK][bB]? | [mM][bB]? | [gG][bB]? | [tT][bB]?
+ ;
+
+fragment TimeUnit
+ : 'ms' | 's' | 'm' | 'h' | 'd'
+ ;
+
 Identifier
  : [a-zA-Z_\-] [a-zA-Z_0-9\-]*
  ;
