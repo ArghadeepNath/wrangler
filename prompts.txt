@@ -1,0 +1,71 @@
+=== Prompt: Modify ANTLR grammar to support BYTE_SIZE and TIME_DURATION ===
+I am enhancing an ANTLR grammar used in CDAP Wrangler to support two new token types: BYTE_SIZE (e.g. "1.5MB", "2GB") and TIME_DURATION (e.g. "100ms", "1.5s", "2min"). Help me define:
+- Lexer rules for BYTE_SIZE and TIME_DURATION, including fragments for BYTE_UNIT and TIME_UNIT
+- Parser rule changes to support these as directive arguments
+- Case-insensitive unit matching (e.g., KB, kb, Kb, etc.)
+- Decimal and integer support (e.g., "1.5MB" and "10KB" both valid)
+Make the rules robust and easy to extend later.
+
+=== Prompt: Regenerate ANTLR Lexer/Parser using Maven ===
+After updating Directives.g4 in wrangler-core, how do I regenerate the ANTLR Java code properly using Maven so that the new lexer/parser is reflected in the project? What’s the correct Maven command or profile?
+
+=== Prompt: ByteSize.java implementation ===
+I need to implement a `ByteSize` class in Java that parses strings like "10KB", "2.5MB", "1GB" and returns their value in bytes as a `long`. The base should be 1024 (i.e., 1MB = 1024 * 1024). The class should:
+- Handle both integer and decimal values
+- Support units: B, KB, MB, GB, TB (case-insensitive)
+- Throw a clear exception on invalid input
+- Include `getBytes()` method
+- Suggest a few test inputs and outputs
+
+=== Prompt: TimeDuration.java implementation ===
+Create a `TimeDuration` Java class that accepts strings like "100ms", "2s", "1.5min" and converts them into nanoseconds internally. It should:
+- Support units: ns, ms, s, min (case-insensitive)
+- Store the value as a long nanosecond representation
+- Expose methods like `getNanos()`, `getMillis()`, `getSeconds()`
+- Handle decimal values
+- Provide proper validation and error messages
+
+=== Prompt: TokenGroup integration for new types ===
+I’ve added new Token types: BYTE_SIZE and TIME_DURATION. How do I correctly modify the visitor and TokenGroup construction logic in the wrangler-core module so that values like “10MB” are parsed into a `ByteSize` token and added to the group?
+
+=== Prompt: Implementing the aggregate-stats directive ===
+I need to create a new Wrangler directive `aggregate-stats` which takes:
+- One column of BYTE_SIZE strings (e.g., “10MB”)
+- One column of TIME_DURATION strings (e.g., “250ms”)
+- Target column names for output
+The directive should:
+- Aggregate the total size (in bytes) and total time (in nanoseconds)
+- Optionally convert results to MB and seconds before output
+- Work across multiple rows using ExecutorContext or internal state
+Help me design the class structure, state handling, and `execute()` + `initialize()` methods.
+
+=== Prompt: Finalize method logic for aggregate directive ===
+How should I finalize an aggregate directive in Wrangler that accumulates data across rows and outputs a single Row with totals? I need help with:
+- Detecting the last row or triggering finalization
+- Writing the result into new columns with correct unit conversion
+- Resetting or clearing state after execution (if needed)
+
+=== Prompt: Unit test strategy for ByteSize and TimeDuration ===
+I need to write JUnit tests for `ByteSize` and `TimeDuration`. Suggest at least 5 test cases for each class, covering:
+- Common units (KB, MB, ms, s)
+- Decimal values (e.g., “1.5MB”, “2.25min”)
+- Invalid inputs (e.g., “12XZ”, “ms10”)
+- Edge cases (zero, very large numbers)
+
+=== Prompt: Unit test for aggregate-stats directive ===
+Help me write a JUnit test that simulates recipe execution of the `aggregate-stats` directive over sample rows. Inputs:
+- Column `data_transfer_size`: ["1MB", "500KB", "1.5MB"]
+- Column `response_time`: ["100ms", "300ms", "200ms"]
+Output:
+- total_size_mb (sum of sizes, converted to MB)
+- total_time_sec (sum of durations, converted to seconds)
+Use `TestingRig.execute()` and `Assert.assertEquals()` with float tolerance.
+
+=== Prompt: README section for aggregate-stats directive ===
+Help me write a README section for a new Wrangler directive `aggregate-stats` that explains:
+- What it does
+- How to use it in a recipe
+- Supported units and arguments
+- An example with sample input and expected output
+Keep it clear and simple for Wrangler users.
+
