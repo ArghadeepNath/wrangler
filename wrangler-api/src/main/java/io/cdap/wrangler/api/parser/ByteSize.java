@@ -5,10 +5,11 @@ import com.google.gson.JsonObject;
 import java.util.Locale;
 
 public class ByteSize implements Token {
+    private final String rawValue;
     private final long bytes;
 
     public ByteSize(String value) {
-        super(Type.BYTE_SIZE, value);
+        this.rawValue = value;
 
         String input = value.trim().toUpperCase(Locale.ENGLISH);
         if (input.matches("^-?\\d+(\\.\\d+)?[KMGTP]?B?$")) {
@@ -24,7 +25,10 @@ public class ByteSize implements Token {
             }
 
             if (unitIndex == 0) {
-                throw new IllegalArgumentException("Invalid ByteSize format: " + value);
+                // Default to bytes if no unit is provided
+                number = Double.parseDouble(input);
+                this.bytes = (long) number;
+                return;
             }
 
             number = Double.parseDouble(input.substring(0, unitIndex));
@@ -60,21 +64,19 @@ public class ByteSize implements Token {
 
     @Override
     public Object value() {
-        return getBytes();
+        return rawValue; // Return the original string representation
     }
 
     @Override
     public TokenType type() {
-        return Type.BYTE_SIZE;
+        return TokenType.BYTE_SIZE;
     }
 
     @Override
     public JsonObject toJson() {
         JsonObject object = new JsonObject();
-        object.addProperty("type", type().name());  // TokenType.BYTE_SIZE
-        object.addProperty("value", getBytes());  // byte value
+        object.addProperty("type", type().name());
+        object.addProperty("value", getBytes());
         return object;
     }
-
-
 }

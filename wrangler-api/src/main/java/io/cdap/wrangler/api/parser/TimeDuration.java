@@ -2,11 +2,12 @@ package io.cdap.wrangler.api.parser;
 
 import com.google.gson.JsonObject;
 
-public class TimeDuration extends Token {
+public class TimeDuration implements Token {
+    private final String rawValue;
     private final long milliseconds;
 
     public TimeDuration(String value) {
-        super(Type.TIME_DURATION, value);
+        this.rawValue = value;
 
         String input = value.trim().toLowerCase();
         long factor;
@@ -27,7 +28,8 @@ public class TimeDuration extends Token {
             factor = 24L * 60L * 60_000L;
             input = input.substring(0, input.length() - 1);
         } else {
-            throw new IllegalArgumentException("Invalid TimeDuration format: " + value);
+            // Default to milliseconds if no unit is provided
+            factor = 1L;
         }
 
         try {
@@ -42,14 +44,18 @@ public class TimeDuration extends Token {
         return milliseconds;
     }
 
+    public long getNanos() {
+        return milliseconds * 1_000_000L;
+    }
+
     @Override
     public Object value() {
-        return getMilliseconds();
+        return rawValue; // Return the original string representation
     }
 
     @Override
     public TokenType type() {
-        return Type.TIME_DURATION;
+        return TokenType.TIME_DURATION;
     }
 
     @Override
@@ -59,5 +65,4 @@ public class TimeDuration extends Token {
         object.addProperty("value", getMilliseconds());
         return object;
     }
-
 }

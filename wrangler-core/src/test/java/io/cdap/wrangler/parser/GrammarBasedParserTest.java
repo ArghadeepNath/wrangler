@@ -75,4 +75,52 @@ public class GrammarBasedParserTest {
     Assert.assertEquals(0, directives.size());
   }
 
+  @Test
+  public void testByteSizeAndTimeDurationParsing() throws Exception {
+    String recipe = "set-column :size 10KB;\n" +
+                    "set-column :time 5s;\n" +
+                    "set-column :mixed_size 1.5MB;\n" +
+                    "set-column :mixed_time 2.5m;";
+    
+    GrammarBasedParser parser = new GrammarBasedParser(recipe);
+    List<Token> tokens = parser.parse();
+    
+    Assert.assertEquals(4, tokens.size());
+    
+    // Check first directive (set-column :size 10KB)
+    Token token = tokens.get(0);
+    Assert.assertEquals("set-column", token.name());
+    Assert.assertEquals(3, token.value().size());
+    Assert.assertEquals(TokenType.COLUMN_NAME, token.value().get(1).type());
+    Assert.assertEquals("size", ((ColumnName) token.value().get(1)).value());
+    Assert.assertEquals(TokenType.BYTE_SIZE, token.value().get(2).type());
+    Assert.assertEquals("10KB", ((ByteSize) token.value().get(2)).value());
+    
+    // Check second directive (set-column :time 5s)
+    token = tokens.get(1);
+    Assert.assertEquals("set-column", token.name());
+    Assert.assertEquals(3, token.value().size());
+    Assert.assertEquals(TokenType.COLUMN_NAME, token.value().get(1).type());
+    Assert.assertEquals("time", ((ColumnName) token.value().get(1)).value());
+    Assert.assertEquals(TokenType.TIME_DURATION, token.value().get(2).type());
+    Assert.assertEquals("5s", ((TimeDuration) token.value().get(2)).value());
+    
+    // Check third directive (set-column :mixed_size 1.5MB)
+    token = tokens.get(2);
+    Assert.assertEquals("set-column", token.name());
+    Assert.assertEquals(3, token.value().size());
+    Assert.assertEquals(TokenType.COLUMN_NAME, token.value().get(1).type());
+    Assert.assertEquals("mixed_size", ((ColumnName) token.value().get(1)).value());
+    Assert.assertEquals(TokenType.BYTE_SIZE, token.value().get(2).type());
+    Assert.assertEquals("1.5MB", ((ByteSize) token.value().get(2)).value());
+    
+    // Check fourth directive (set-column :mixed_time 2.5m)
+    token = tokens.get(3);
+    Assert.assertEquals("set-column", token.name());
+    Assert.assertEquals(3, token.value().size());
+    Assert.assertEquals(TokenType.COLUMN_NAME, token.value().get(1).type());
+    Assert.assertEquals("mixed_time", ((ColumnName) token.value().get(1)).value());
+    Assert.assertEquals(TokenType.TIME_DURATION, token.value().get(2).type());
+    Assert.assertEquals("2.5m", ((TimeDuration) token.value().get(2)).value());
+  }
 }
