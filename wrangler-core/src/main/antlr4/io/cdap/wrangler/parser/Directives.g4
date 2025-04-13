@@ -1,19 +1,3 @@
-/*
- * Copyright © 2017-2019 Cask Data, Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
- */
-
 grammar Directives;
 
 options {
@@ -51,7 +35,7 @@ statements
 
 directive
  : command
-  (   codeblock
+  ( codeblock
     | identifier
     | macro
     | text
@@ -64,6 +48,8 @@ directive
     | stringList
     | numberRanges
     | properties
+    | byteSizeArg  // Added byte size argument support
+    | timeDurationArg  // Added time duration argument support
   )*?
   ;
 
@@ -195,6 +181,13 @@ identifierList
  : Identifier (',' Identifier)*
  ;
 
+byteSizeArg
+ : ByteSize
+ ;
+
+timeDurationArg
+ : TimeDuration
+ ;
 
 /*
  * Following are the Lexer Rules used for tokenizing the recipe.
@@ -247,7 +240,6 @@ BackSlash: '\\';
 Dollar   : '$';
 Tilde    : '~';
 
-
 Bool
  : 'true'
  | 'false'
@@ -296,20 +288,17 @@ EscapeSequence
    |   OctalEscape
    ;
 
-fragment
-OctalEscape
+fragment OctalEscape
    :   '\\' ('0'..'3') ('0'..'7') ('0'..'7')
    |   '\\' ('0'..'7') ('0'..'7')
    |   '\\' ('0'..'7')
    ;
 
-fragment
-UnicodeEscape
+fragment UnicodeEscape
    :   '\\' 'u' HexDigit HexDigit HexDigit HexDigit
    ;
 
-fragment
-   HexDigit : ('0'..'9'|'a'..'f'|'A'..'F') ;
+fragment HexDigit : ('0'..'9'|'a'..'f'|'A'..'F') ;
 
 Comment
  : ('//' ~[\r\n]* | '/*' .*? '*/' | '--' ~[\r\n]* ) -> skip

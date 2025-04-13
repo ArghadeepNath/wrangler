@@ -16,7 +16,6 @@
 
 package io.cdap.wrangler.api.parser;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import io.cdap.wrangler.api.annotations.PublicEvolving;
 
@@ -42,7 +41,7 @@ public class DirectiveName implements Token {
   }
 
   @Override
-  public JsonElement toJson() {
+  public JsonObject toJson() {
     JsonObject object = new JsonObject();
     object.addProperty("type", TokenType.DIRECTIVE_NAME.name());
     object.addProperty("value", value);

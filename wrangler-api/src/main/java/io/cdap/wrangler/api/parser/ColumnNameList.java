@@ -17,7 +17,6 @@
 package io.cdap.wrangler.api.parser;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import io.cdap.wrangler.api.annotations.PublicEvolving;
@@ -47,7 +46,7 @@ public class ColumnNameList implements Token {
   }
 
   @Override
-  public JsonElement toJson() {
+  public JsonObject toJson() {
     JsonObject object = new JsonObject();
     object.addProperty("type", TokenType.COLUMN_NAME_LIST.name());
     JsonArray array = new JsonArray();

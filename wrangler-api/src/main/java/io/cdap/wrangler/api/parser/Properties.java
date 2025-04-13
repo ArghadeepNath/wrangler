@@ -16,7 +16,6 @@
 
 package io.cdap.wrangler.api.parser;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import io.cdap.wrangler.api.annotations.PublicEvolving;
 
@@ -44,7 +43,7 @@ public class Properties implements Token {
   }
 
   @Override
-  public JsonElement toJson() {
+  public JsonObject toJson() {
     JsonObject object = new JsonObject();
     for (Map.Entry<String, Token> entry : values.entrySet()) {
       object.add(entry.getKey(), entry.getValue().toJson());
